@@ -39,6 +39,10 @@ defmodule CarboniteIssueDemo.NotesTest do
       assert {:ok, %Note{} = note} = Notes.update_note(note, update_attrs)
       assert note.title == "some updated title"
       assert note.body == "some updated body"
+
+      Carbonite.Query.transactions(preload: true)
+      |> CarboniteIssueDemo.Repo.all()
+      |> dbg()
     end
 
     test "update_note/2 with invalid data returns error changeset" do
