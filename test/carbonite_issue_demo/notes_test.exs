@@ -40,15 +40,30 @@ defmodule CarboniteIssueDemo.NotesTest do
       assert note.title == "some updated title"
       assert note.body == "some updated body"
 
-      Carbonite.Query.transactions(preload: true)
-      |> CarboniteIssueDemo.Repo.all()
-      |> dbg()
+      meta =
+        Carbonite.Query.current_transaction()
+        |> CarboniteIssueDemo.Repo.one!()
+        |> Map.fetch!(:meta)
+
+      assert ^meta = %{"type" => "note_created"}
     end
 
     test "update_note/2 with invalid data returns error changeset" do
       note = note_fixture()
       assert {:error, %Ecto.Changeset{}} = Notes.update_note(note, @invalid_attrs)
       assert note == Notes.get_note!(note.id)
+
+      meta =
+        Carbonite.Query.current_transaction()
+        |> CarboniteIssueDemo.Repo.one!()
+        |> Map.fetch!(:meta)
+
+      # Assertion with ^meta failed
+      #
+      # match (=) failed
+      # The following variables were pinned:
+      #   meta = %{"type" => "note_created"}
+      assert ^meta = %{"type" => "note_updated"}
     end
 
     test "delete_note/1 deletes the note" do
