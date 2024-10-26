@@ -40,7 +40,7 @@ defmodule CarboniteIssueDemo.NotesTest do
     end
 
     test "update_note/2 with valid data updates the note" do
-      note = note_fixture()
+      note = with_ignored_carbonite(fn -> note_fixture() end)
       update_attrs = %{title: "some updated title", body: "some updated body"}
       assert {:ok, %Note{} = note} = Notes.update_note(note, update_attrs)
       assert note.title == "some updated title"
@@ -75,5 +75,12 @@ defmodule CarboniteIssueDemo.NotesTest do
       note = note_fixture()
       assert %Ecto.Changeset{} = Notes.change_note(note)
     end
+  end
+
+  def with_ignored_carbonite(fun) do
+    Carbonite.override_mode(CarboniteIssueDemo.Repo, to: :ignore)
+    result = fun.()
+    Carbonite.override_mode(CarboniteIssueDemo.Repo, to: :capture)
+    result
   end
 end
