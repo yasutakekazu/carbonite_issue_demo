@@ -1,6 +1,10 @@
 # CarboniteIssueDemo
 
-To start your Phoenix server:
+This repository was created to reproduce the issue reported in [Carbonite Issue #120](https://github.com/bitcrowd/carbonite/issues/120).
+
+It demonstrates the problem where a `Carbonite.Transaction` created in a fixture setup persists into subsequent tests, leading to incorrect transaction metadata in update operations.
+
+## To start your Phoenix server:
 
   * Run `mix setup` to install and setup dependencies
   * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
