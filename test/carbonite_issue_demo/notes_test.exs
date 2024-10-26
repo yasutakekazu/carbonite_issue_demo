@@ -26,19 +26,6 @@ defmodule CarboniteIssueDemo.NotesTest do
       assert {:ok, %Note{} = note} = Notes.create_note(valid_attrs)
       assert note.title == "some title"
       assert note.body == "some body"
-    end
-
-    test "create_note/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Notes.create_note(@invalid_attrs)
-    end
-
-    test "update_note/2 with valid data updates the note" do
-      note = note_fixture()
-      update_attrs = %{title: "some updated title", body: "some updated body"}
-
-      assert {:ok, %Note{} = note} = Notes.update_note(note, update_attrs)
-      assert note.title == "some updated title"
-      assert note.body == "some updated body"
 
       meta =
         Carbonite.Query.current_transaction()
@@ -48,22 +35,34 @@ defmodule CarboniteIssueDemo.NotesTest do
       assert ^meta = %{"type" => "note_created"}
     end
 
-    test "update_note/2 with invalid data returns error changeset" do
+    test "create_note/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Notes.create_note(@invalid_attrs)
+    end
+
+    test "update_note/2 with valid data updates the note" do
       note = note_fixture()
-      assert {:error, %Ecto.Changeset{}} = Notes.update_note(note, @invalid_attrs)
-      assert note == Notes.get_note!(note.id)
+      update_attrs = %{title: "some updated title", body: "some updated body"}
+      assert {:ok, %Note{} = note} = Notes.update_note(note, update_attrs)
+      assert note.title == "some updated title"
+      assert note.body == "some updated body"
+
+      Carbonite.Query.transactions(preload: true)
+      |> CarboniteIssueDemo.Repo.all()
+      |> dbg()
 
       meta =
         Carbonite.Query.current_transaction()
         |> CarboniteIssueDemo.Repo.one!()
         |> Map.fetch!(:meta)
 
-      # Assertion with ^meta failed
-      #
-      # match (=) failed
-      # The following variables were pinned:
-      #   meta = %{"type" => "note_created"}
+      # This assertion fails because the meta type is "note_created"
       assert ^meta = %{"type" => "note_updated"}
+    end
+
+    test "update_note/2 with invalid data returns error changeset" do
+      note = note_fixture()
+      assert {:error, %Ecto.Changeset{}} = Notes.update_note(note, @invalid_attrs)
+      assert note == Notes.get_note!(note.id)
     end
 
     test "delete_note/1 deletes the note" do
