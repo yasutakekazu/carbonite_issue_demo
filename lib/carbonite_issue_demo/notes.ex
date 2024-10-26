@@ -50,9 +50,20 @@ defmodule CarboniteIssueDemo.Notes do
 
   """
   def create_note(attrs \\ %{}) do
-    %Note{}
-    |> Note.changeset(attrs)
-    |> Repo.insert()
+    tx_result =
+      CarboniteIssueDemo.Repo.transaction(fn ->
+        {:ok, _} =
+          Carbonite.insert_transaction(CarboniteIssueDemo.Repo, %{meta: %{type: "note_created"}})
+
+        %Note{}
+        |> Note.changeset(attrs)
+        |> Repo.insert()
+      end)
+
+    case tx_result do
+      {:ok, result} -> result
+      {:error, result} -> result
+    end
   end
 
   @doc """
