@@ -58,7 +58,8 @@ defmodule CarboniteIssueDemo.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:carbonite, "~> 0.14.2"}
     ]
   end
 
